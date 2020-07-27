@@ -53,6 +53,7 @@
     // 데이터를 받아오는 것으로 교체 되어야 함
     $.ajax({
       type: "get",
+      // 어차피 Github Pages는 HTTPS라 그냥 다운 받아서 로컬 테스트 해야함 ㅎ
       url: "http://mirs.co.kr:8083/predict?shopcode=1234&id=58086",
       dataType: "json",
       // 데이터를 받아오는 것에 성공하면
