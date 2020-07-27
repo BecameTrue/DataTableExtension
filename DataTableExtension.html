@@ -54,9 +54,11 @@
 
   <body>
     <!-- 데이터 호출 버튼 -->
-    <button id="show" class="btn btn-primary">
-      데이터 불러오기
-    </button>
+    <div style="text-align: center; padding: 32px;">
+      <button id="show-btn" class="btn btn-primary" style="margin-right: 16px;">
+        데이터 불러오기
+      </button>
+    </div>
 
     <!-- 
       DataTables가 위치할 공간이자, 상단 컬럼명 작성
@@ -74,7 +76,7 @@
       <tbody>
         <tr>
           <td>데이터를 불러오세요.</td>
-          <td></td>
+          <td>이 행은 데이터 테이블이 초기화 될 때 사라집니다.</td>
           <td></td>
           <td></td>
         </tr>
