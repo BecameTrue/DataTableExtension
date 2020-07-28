@@ -8,26 +8,28 @@
       const worksheets =
         tableau.extensions.dashboardContent.dashboard.worksheets;
 
-      worksheets.forEach((sheet) => {
-        let btn = makeButton(sheet.name, () => onSelectWorksheet(sheet.name));
+      worksheets.forEach((sheet, idx) => {
+        let btn = makeButton(sheet.name, idx, () =>
+          onSelectWorksheet(sheet.name, idx)
+        );
         $("#select-worksheet-area").append(btn);
       });
     });
   });
 
-  var makeButton = (name, onClickFunction) => {
+  var makeButton = (name, idx, onClickFunction) => {
     const button = $("<input type='button'>");
-    button.attr("id", "sheet-" + name);
+    button.attr("id", "sheet-" + idx);
     button.val(name);
     button.addClass("btn btn-outline-primary btn-sm");
     button.on("click", () => onClickFunction());
     return button;
   };
 
-  var onSelectWorksheet = (sheetName) => {
+  var onSelectWorksheet = (sheetName, idx) => {
     selectedWorksheet = sheetName;
-    $("button[id^='sheet-']").attr("class", "btn btn-outline-primary btn-sm");
-    $("#sheet-" + sheetName).attr("class", "btn btn-primary btn-sm");
+    $("input[id^='sheet-']").attr("class", "btn btn-outline-primary btn-sm");
+    $("#sheet-" + idx).attr("class", "btn btn-primary btn-sm");
     console.log("clicked " + sheetName);
   };
 })();
