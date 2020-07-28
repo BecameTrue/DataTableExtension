@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>데이터 테이블 확장</title>
+    <title>구성하기</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- 부트스트랩 CSS 이미 페이지에 내장 되어 있으면 필요 없음 -->
@@ -14,15 +14,8 @@
       crossorigin="anonymous"
     />
 
-    <!-- DataTables CSS 파일 -->
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="lib/DataTables/datatables.min.css"
-    />
-
     <!-- 커스텀 CSS 파일 -->
-    <link rel="stylesheet" type="text/css" href="DataTableExtension.css" />
+    <link rel="stylesheet" type="text/css" href="ConfigureDialog.css" />
 
     <!-- JQuery 이미 존재하면 필요 없음(부트스트랩 및 DataTables 라이브러리 요구사항) -->
     <script
@@ -45,12 +38,6 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- DataTables JS 파일 -->
-    <script
-      type="text/javascript"
-      src="lib/DataTables/datatables.min.js"
-    ></script>
-
     <!-- Tableau JS 파일 -->
     <script
       type="text/javascript"
@@ -58,47 +45,19 @@
     ></script>
 
     <!-- 커스텀 JS 파일 -->
-    <script src="DataTableExtension.js"></script>
+    <script src="ConfigureDialog.js"></script>
   </head>
 
   <body>
-    <!-- 데이터 호출 버튼 -->
-    <div style="text-align: center; padding: 32px;">
-      <button
-        id="configure-button"
-        class="btn btn-primary"
-        style="margin-right: 16px;"
-      >
-        구성
-      </button>
+    <div>
+      <h3>워크시트 선택</h3>
+      <p>표로 만들 워크시트를 선택 해주세요.</p>
+      <span id="select-worksheet-area">
+        <button class="btn btn-outline-primary btn-sm">asdf</button>
+        <button class="btn btn-outline-primary btn-sm">asdf</button>
+      </span>
     </div>
-
-    <!-- 
-      DataTables가 위치할 공간이자, 상단 컬럼명 작성
-      class는 부트스트랩의 hover 효과를 사용하기 위해서 넣었음 
-    -->
-    <table
-      id="data-table"
-      class="table-hover"
-      width="100%"
-      style="display: none;"
-    >
-      <thead>
-        <tr>
-          <th>상품 번호</th>
-          <th>상품명</th>
-          <th>상품 이미지</th>
-          <th>평가 점수</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>'구성'을 눌러 시작해보세요.</td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
+    <div>컬럼 설정 div</div>
+    <div>레이아웃</div>
   </body>
 </html>
