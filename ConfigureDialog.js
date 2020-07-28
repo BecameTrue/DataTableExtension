@@ -21,18 +21,17 @@
     const button = $("<input type='button'>");
     button.attr("id", "sheet-" + idx);
     button.val(name);
-    button.addClass("btn btn-outline-primary btn-sm mr-3");
+    button.addClass("btn btn-outline-primary btn-sm");
     button.on("click", () => onClickFunction());
     return button;
   };
 
   var onSelectWorksheet = (sheetName, idx) => {
     selectedWorksheet = sheetName;
-    $("input[id^='sheet-']").attr(
-      "class",
-      "btn btn-outline-primary btn-sm mr-3"
-    );
-    $("#sheet-" + idx).attr("class", "btn btn-primary btn-sm mr-3");
-    console.log("clicked " + sheetName);
+    $("input[id^='sheet-']").attr("class", "btn btn-outline-primary btn-sm");
+    $("#sheet-" + idx).attr("class", "btn btn-primary btn-sm");
+    console.log(selectedWorksheet);
+
+    $("#select-image-columns-area").show();
   };
 })();
