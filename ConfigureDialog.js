@@ -20,7 +20,7 @@
     button.attr("id", "sheet-" + name);
     button.text(name);
     button.addClass("btn btn-outline-primary btn-sm");
-    button.on("click", onClickFunction);
+    button.on("click", () => onClickFunction());
     return button;
   };
 
