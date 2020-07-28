@@ -63,8 +63,8 @@
             mirs API가 이미 배열인 것을 한번 더 배열로 감싸 보내주기 때문에
             풀어준 것. 일반적으로는 response 그대로 사용해도 될 것임
         */
+        // console.log(JSON.stringify(response));
         var dataFromAPI = response[0];
-        // console.log(dataFromAPI);
 
         // DataTables 초기 설정 및 데이터 렌더링
         initializeDataTable(dataFromAPI);
