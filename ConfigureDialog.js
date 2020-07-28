@@ -28,5 +28,6 @@
     selectedWorksheet = sheetName;
     $("button[id^='sheet-']").attr("class", "btn btn-outline-primary btn-sm");
     $("#sheet-" + sheetName).attr("class", "btn btn-primary btn-sm");
+    console.log("clicked " + sheetName);
   };
 })();
