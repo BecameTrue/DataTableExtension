@@ -16,9 +16,9 @@
   });
 
   var makeButton = (name, onClickFunction) => {
-    const button = $("<button></button>");
+    const button = $("<input type='button'>");
     button.attr("id", "sheet-" + name);
-    button.text(name);
+    button.val(name);
     button.addClass("btn btn-outline-primary btn-sm");
     button.on("click", () => onClickFunction());
     return button;
