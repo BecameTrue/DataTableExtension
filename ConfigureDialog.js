@@ -30,14 +30,22 @@
     selectedWorksheet = sheetName;
     $("input[id^='sheet-']").attr("class", "btn btn-outline-primary btn-sm");
     $("#sheet-" + idx).attr("class", "btn btn-primary btn-sm");
-    console.log(selectedWorksheet);
 
+    initializeSelectImageColumns();
+  };
+
+  var initializeSelectImageColumns = () => {
     $("#select-image-columns-area").show();
 
     const worksheets = tableau.extensions.dashboardContent.dashboard.worksheets;
     var worksheet = worksheets.find(
       (sheet) => sheet.name === selectedWorksheet
     );
-    worksheet.getSummaryDataAsync().then((summary) => console.log(summary));
+    worksheet.getSummaryDataAsync().then((summary) => {
+      var columns = summary.columns;
+      console.log(columns);
+    });
   };
+
+  var generateColumnButtons = (columns) => {};
 })();
