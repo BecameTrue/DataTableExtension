@@ -33,5 +33,11 @@
     console.log(selectedWorksheet);
 
     $("#select-image-columns-area").show();
+
+    const worksheets = tableau.extensions.dashboardContent.dashboard.worksheets;
+    var worksheet = worksheets.find(
+      (sheet) => sheet.name === selectedWorksheet
+    );
+    worksheet.getSummaryDataAsync().then((summary) => console.log(summary));
   };
 })();
