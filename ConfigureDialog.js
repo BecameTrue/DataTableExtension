@@ -1,5 +1,6 @@
 (function () {
   var selectedWorksheet;
+  var columns = [];
 
   $(document).ready(function () {
     tableau.extensions.initializeDialogAsync().then(function (openPayload) {
@@ -9,17 +10,19 @@
         tableau.extensions.dashboardContent.dashboard.worksheets;
 
       worksheets.forEach((sheet, idx) => {
-        let btn = makeButton(sheet.name, idx, () =>
+        let btn = makeButton(sheet.name, "sheet-", idx, () =>
           onSelectWorksheet(sheet.name, idx)
         );
         $("#select-worksheet-area").append(btn);
       });
     });
+
+    $("#finish-btn").on("click", () => finishDialog());
   });
 
-  var makeButton = (name, idx, onClickFunction) => {
+  var makeButton = (name, prefix, id, onClickFunction) => {
     const button = $("<input type='button'>");
-    button.attr("id", "sheet-" + idx);
+    button.attr("id", prefix + id);
     button.val(name);
     button.addClass("btn btn-outline-primary btn-sm");
     button.on("click", () => onClickFunction());
@@ -31,21 +34,76 @@
     $("input[id^='sheet-']").attr("class", "btn btn-outline-primary btn-sm");
     $("#sheet-" + idx).attr("class", "btn btn-primary btn-sm");
 
-    initializeSelectImageColumns();
+    initializeColumns().then(() => {
+      showSettingDetailsArea();
+    });
   };
 
-  var initializeSelectImageColumns = () => {
-    $("#select-image-columns-area").show();
-
+  var initializeColumns = async () => {
     const worksheets = tableau.extensions.dashboardContent.dashboard.worksheets;
     var worksheet = worksheets.find(
       (sheet) => sheet.name === selectedWorksheet
     );
-    worksheet.getSummaryDataAsync().then((summary) => {
-      var columns = summary.columns;
-      console.log(columns);
+    await worksheet.getSummaryDataAsync().then((summary) => {
+      summary.columns.forEach((column) => {
+        columns.push({
+          fieldName: column.fieldName,
+          isImageURL: false,
+          altText: null,
+        });
+      });
     });
   };
 
-  var generateColumnButtons = (columns) => {};
+  var showSettingDetailsArea = () => {
+    $("#select-image-columns-area").show();
+    $("#select-layout-area").show();
+    generateColumnButtons(columns, $("#select-image-columns"));
+  };
+
+  var generateColumnButtons = (columns, targetArea) => {
+    /*
+      each column = {
+        dataType : "string"
+        fieldName : "GOODS_CODE"
+        index : 0
+        isReferenced : true
+      }
+    */
+    columns.forEach((column, idx) => {
+      let btn = makeButton(column.fieldName, "imgcol-", idx, () =>
+        onSelectImageColumn(column.fieldName, idx)
+      );
+      targetArea.append(btn);
+    });
+  };
+
+  var onSelectImageColumn = (fieldName, idx) => {
+    $("input[id^='imgcol-']").attr("class", "btn btn-outline-primary btn-sm");
+    $("#imgcol-" + idx).attr("class", "btn btn-primary btn-sm");
+    columns.forEach((col) => {
+      col.isImageURL = false;
+    });
+    var selectedColumn = columns.find((col) => col.fieldName === fieldName);
+    selectedColumn.isImageURL = true;
+  };
+
+  var finishDialog = () => {
+    if (!selectedWorksheet) {
+      alert("워크시트를 선택하세요.");
+    } else {
+      var imgSize = $("#image-size").val();
+      var imgAltText = $("#alt-text").val();
+      var imgColumn = columns.find((col) => col.isImageURL === true);
+
+      if (imgSize !== "") imgColumn.size = parseInt(imgSize);
+      if (imgAltText !== "") imgColumn.altText = imgAltText;
+
+      var closePayload = {
+        sheetName: selectedWorksheet,
+        columns: columns,
+      };
+      tableau.extensions.ui.closeDialog(closePayload);
+    }
+  };
 })();

@@ -19,7 +19,7 @@
   var configure = () => {
     // 다이얼로그 HTML 파일 경로
     const dialogURL =
-      "https://chash.in/DataTableExtension/ConfigureDialog.html";
+      "http://localhost:8765/Samples/DataTableExtension/ConfigureDialog.html";
 
     /* 
       다이얼로그에게 전달해주고 싶은 값
@@ -61,9 +61,9 @@
 
     // 테이블이 보이게 한 뒤 - 초기에 display: none 설정되어 있음
     $("#data-table").show();
-
+    console.log(payload);
     // 데이터테이블 생성
-    initializeDataTable(sheetData);
+    // initializeDataTable(sheetData);
   };
 
   var initializeDataTable = (dataToRender) => {

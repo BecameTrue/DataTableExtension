@@ -3,10 +3,10 @@ body {
 }
 
 .arrange-buttons {
-  display: flex;
-  flex-direction: row;
+  display: block;
 }
 
 .arrange-buttons input {
   margin-right: 8px;
+  margin-bottom: 8px;
 }
