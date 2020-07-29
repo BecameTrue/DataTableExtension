@@ -50,6 +50,8 @@
   };
 
   var onDialogFinished = (payload) => {
+    console.log(JSON.parse(payload));
+
     // 설정 값들을 쿠키에 저장하고
 
     // 워크시트의 값을 불러오고
@@ -57,7 +59,7 @@
 
     // 테이블이 보이게 한 뒤 - 초기에 display: none 설정되어 있음
     $("#data-table").show();
-    console.log(JSON.parse(payload));
+
     // 데이터테이블 생성
     // initializeDataTable(sheetData);
   };
