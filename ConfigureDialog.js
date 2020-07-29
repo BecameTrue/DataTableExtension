@@ -1,6 +1,7 @@
 (function () {
   var selectedWorksheet;
   var columns = [];
+  var sheetData = [];
 
   $(document).ready(function () {
     tableau.extensions.initializeDialogAsync().then(function (openPayload) {
@@ -44,15 +45,29 @@
     var worksheet = worksheets.find(
       (sheet) => sheet.name === selectedWorksheet
     );
-    await worksheet.getSummaryDataAsync().then((summary) => {
-      summary.columns.forEach((column) => {
-        columns.push({
-          fieldName: column.fieldName,
-          isImageURL: false,
-          altText: null,
-        });
+
+    return await worksheet
+      .getUnderlyingTablesAsync()
+      .then(async (logicalTable) => {
+        await worksheet
+          .getUnderlyingTableDataAsync(logicalTable[0].id)
+          .then((dataTable) => {
+            dataTable.columns.forEach((column) => {
+              columns.push({
+                fieldName: column.fieldName,
+                isImageURL: false,
+                altText: null,
+              });
+            });
+            dataTable.data.forEach((row) => {
+              var refinedRow = {};
+              row.forEach((data, idx) => {
+                refinedRow[columns[idx].fieldName] = data.formattedValue;
+              });
+              sheetData.push(refinedRow);
+            });
+          });
       });
-    });
   };
 
   var showSettingDetailsArea = () => {
@@ -92,7 +107,8 @@
     if (!selectedWorksheet) {
       alert("워크시트를 선택하세요.");
     } else {
-      var imgSize = $("#image-size").val();
+      var imgSize =
+        $("#image-size").val() !== "" ? $("#image-size").val() : "60";
       var imgAltText = $("#alt-text").val();
       var imgColumn = columns.find((col) => col.isImageURL === true);
 
@@ -100,8 +116,9 @@
       if (imgAltText !== "") imgColumn.altText = imgAltText;
 
       var closePayload = {
-        sheetName: selectedWorksheet,
+        name: selectedWorksheet,
         columns: columns,
+        data: sheetData,
       };
       tableau.extensions.ui.closeDialog(JSON.stringify(closePayload));
     }

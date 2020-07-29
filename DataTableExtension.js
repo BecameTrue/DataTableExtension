@@ -49,13 +49,10 @@
       });
   };
 
-  var onDialogFinished = (payload) => {
-    console.log(JSON.parse(payload));
-
+  var onDialogFinished = (payloadString) => {
+    var payload = JSON.parse(payloadString);
+    console.log(payload);
     // 설정 값들을 쿠키에 저장하고
-
-    // 워크시트의 값을 불러오고
-    const sheetData = getWorksheetData(payload.sheetName);
 
     // 테이블이 보이게 한 뒤 - 초기에 display: none 설정되어 있음
     $("#data-table").show();
