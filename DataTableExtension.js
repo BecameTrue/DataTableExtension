@@ -22,13 +22,9 @@
       "http://localhost:8765/Samples/DataTableExtension/ConfigureDialog.html";
 
     /* 
-      다이얼로그에게 전달해주고 싶은 값
+      다이얼로그에게 전달해주고 싶은 값(문자열만 가능!)
       전달할 게 없다면 " " 공백 하나를 넣어 보내면 되고,
       var myOpenPayload = " ";
-      혹은 displayDialogAsync에서 아예 빼고 실행시켜도 됨
-      var myOpenPayload = {
-        val : "객체도 전달할 수 있음"
-      };
     */
     var openPayload = " ";
 
@@ -42,7 +38,7 @@
     tableau.extensions.ui
       .displayDialogAsync(dialogURL, openPayload, dialogSetting)
       .then((closePayload) => {
-        // 다이얼로그가 정상적으로 종료될 때 다이얼로그가 데이터를 매개변수에 담아줌
+        // 다이얼로그가 정상적으로 종료될 때 다이얼로그가 데이터(문자열만 가능!)를 매개변수에 담아줌
         // 해당 매개변수를 이용해, 다이얼로그가 종료될 때 동작할 함수 실행
         onDialogFinished(closePayload);
       })
@@ -61,7 +57,7 @@
 
     // 테이블이 보이게 한 뒤 - 초기에 display: none 설정되어 있음
     $("#data-table").show();
-    console.log(payload);
+    console.log(JSON.parse(payload));
     // 데이터테이블 생성
     // initializeDataTable(sheetData);
   };

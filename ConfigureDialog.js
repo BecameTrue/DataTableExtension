@@ -103,7 +103,7 @@
         sheetName: selectedWorksheet,
         columns: columns,
       };
-      tableau.extensions.ui.closeDialog(closePayload);
+      tableau.extensions.ui.closeDialog(JSON.stringify(closePayload));
     }
   };
 })();
