@@ -1,7 +1,7 @@
 (function () {
   var selectedWorksheet;
   var columns = [];
-  var sheetData = [];
+  // var sheetData = [];
 
   $(document).ready(function () {
     tableau.extensions.initializeDialogAsync().then(function (openPayload) {
@@ -59,13 +59,13 @@
                 altText: null,
               });
             });
-            dataTable.data.forEach((row) => {
-              var refinedRow = {};
-              row.forEach((data, idx) => {
-                refinedRow[columns[idx].fieldName] = data.formattedValue;
-              });
-              sheetData.push(refinedRow);
-            });
+            // dataTable.data.forEach((row) => {
+            //   var refinedRow = {};
+            //   row.forEach((data, idx) => {
+            //     refinedRow[columns[idx].fieldName] = data.formattedValue;
+            //   });
+            //   sheetData.push(refinedRow);
+            // });
           });
       });
   };
@@ -112,13 +112,15 @@
       var imgAltText = $("#alt-text").val();
       var imgColumn = columns.find((col) => col.isImageURL === true);
 
-      if (imgSize !== "") imgColumn.size = parseInt(imgSize);
-      if (imgAltText !== "") imgColumn.altText = imgAltText;
+      if (imgColumn) {
+        if (imgSize !== "") imgColumn.size = parseInt(imgSize);
+        if (imgAltText !== "") imgColumn.altText = imgAltText;
+      }
 
       var closePayload = {
-        name: selectedWorksheet,
+        sheetName: selectedWorksheet,
         columns: columns,
-        data: sheetData,
+        // data: sheetData,
       };
       tableau.extensions.ui.closeDialog(JSON.stringify(closePayload));
     }

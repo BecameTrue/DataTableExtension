@@ -54,13 +54,73 @@
     console.log(payload);
     // 설정 값들을 쿠키에 저장하고
 
-    // 테이블이 보이게 한 뒤 - 초기에 display: none 설정되어 있음
-    $("#data-table").show();
-    // 데이터테이블 생성
-    // initializeDataTable(sheetData);
+    // 데이터를 가져온 뒤
+    getDataFrom(payload).then((sheetData) => {
+      // 테이블이 보이게 한 뒤 - 초기에 display: none 설정되어 있음
+      $("#data-table").show();
+      var columns = setColumns(payload.columns);
+      // 데이터테이블 생성
+      initializeDataTable(columns, sheetData);
+    });
   };
 
-  var initializeDataTable = (dataToRender) => {
+  var getDataFrom = async (payload) => {
+    const worksheets = tableau.extensions.dashboardContent.dashboard.worksheets;
+    var worksheet = worksheets.find(
+      (sheet) => sheet.name === payload.sheetName
+    );
+
+    return await worksheet
+      .getUnderlyingTablesAsync()
+      .then(async (logicalTable) => {
+        return await worksheet
+          .getUnderlyingTableDataAsync(logicalTable[0].id)
+          .then((dataTable) => {
+            var data = [];
+            dataTable.data.forEach((row) => {
+              var refinedRow = {};
+              row.forEach((data, idx) => {
+                refinedRow[payload.columns[idx].fieldName] =
+                  data.formattedValue;
+              });
+              data.push(refinedRow);
+            });
+            console.log(data);
+            return data;
+          });
+      });
+  };
+
+  // HTML Table 요소에 접근해 상단 컬럼명들 수정 및
+  // DataTables 초기화 용 컬럼 배열 반환
+  var setColumns = (columnsMetaData) => {
+    var columns = [];
+    columnsMetaData.forEach((meta) => {
+      var col = {};
+      col["data"] = meta.fieldName;
+      if (meta.isImageURL) {
+        col["render"] = function (data, type, row) {
+          if (type === "display") {
+            return imageTag({
+              src: data,
+              tagStyle: "height: " + meta.size + "px;",
+            });
+          } else return data;
+        };
+      }
+      if (!meta.altText || meta.altText === "") {
+        $("#data-table-columns").append($("<th>" + meta.fieldName + "</th>"));
+      } else {
+        $("#data-table-columns").append($("<th>" + meta.altText + "</th>"));
+      }
+
+      columns.push(col);
+    });
+
+    return columns;
+  };
+
+  var initializeDataTable = (columns, dataToRender) => {
     $("#data-table").DataTable({
       // 테이블이 알아서 재초기화 될 수 있도록 삭제 가능하게 설정
       // 이 설정이 없으면 같은 곳에 다시 테이블을 만들 수 없음
@@ -71,7 +131,7 @@
 
       // 테이블과 페이지 버튼, 부가 기능 버튼 등
       // 배치를 어떻게 할 것인지 작성한 것
-      dom: '<"top"fR>t<"bottom"p><"clear"B>',
+      dom: '<"top"BfR>t<"bottom"p><"clear">',
 
       /*
         총 4가지의 버튼을 사용할 수 있으며 각각 해당하는 라이브러리를
@@ -102,41 +162,7 @@
         - type : https://datatables.net/manual/data/orthogonal-data 참고
         - row : 행에 존재하는 다른 값들에 접근하기 위해 사용
       */
-      columns: [
-        { data: "GOODS_CODE" },
-        {
-          data: "GOODS_NAME",
-          render: function (data, type, row) {
-            return anchorTag({
-              // row.GOODS_URL도 가능하지만
-              // 키 값이 "GOODS URL" 이었다면 row.GOODS URL은 에러를 발생시키므로
-              // 안전하게 다음과 같이 사용
-              href: row["GOODS_URL"],
-              inside: data,
-            });
-            // return "<a href='" + row["GOODS_URL"] + "'>" + data + "</a>";
-          },
-        },
-        {
-          data: "GOODS_IMG_URL",
-          render: function (data, type, row) {
-            // 각각 log를 찍어서 어떤 값이 들어있는 지 확인할 수 있음
-            // console.log("data is : ", data);
-            // console.log("type is : ", type);
-            // console.log("row is : ", row);
-            if (type === "display") {
-              return anchorTag({
-                href: row["GOODS_URL"],
-                inside: imageTag({
-                  src: data,
-                  tagStyle: "height: 80px;",
-                }),
-              });
-            } else return data;
-          },
-        },
-        { data: "rating" },
-      ],
+      columns: columns,
     });
   };
 
