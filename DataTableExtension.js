@@ -1,15 +1,14 @@
 (function () {
-  // HTML 문서가 준비되면 'show', 'destroy' id를 가진 버튼에 클릭 시 실행될 함수 연결
   $(document).ready(function () {
     // 태블로 라이브러리 초기화
     tableau.extensions.initializeAsync({ configure: configure }).then(
+      // 초기화 완료되면 실행 될 함수
       function () {
-        console.log("초기화 완료");
-        // 초기화 완료되면 버튼에 클릭 이벤트 달기
+        // 버튼에 클릭 이벤트 달기
         $("#configure-button").on("click", () => configure());
       },
+      // 태블로 초기화 중 에러가 발생했을 때 로그
       function (err) {
-        // 태블로 초기화 중 에러 발생
         console.log(err);
       }
     );
@@ -28,67 +27,87 @@
     */
     var openPayload = " ";
 
-    // 다이얼로그 관련 설정
-    var dialogSetting = {
+    // 다이얼로그 설정
+    const dialogSetting = {
       height: 500,
       width: 500,
     };
 
-    // 다이얼로그
+    // 다이얼로그 열기
     tableau.extensions.ui
       .displayDialogAsync(dialogURL, openPayload, dialogSetting)
       .then((closePayload) => {
-        // 다이얼로그가 정상적으로 종료될 때 다이얼로그가 데이터(문자열만 가능!)를 매개변수에 담아줌
-        // 해당 매개변수를 이용해, 다이얼로그가 종료될 때 동작할 함수 실행
+        // 다이얼로그가 정상적으로 종료될 때 다이얼로그가
+        // 데이터(문자열만 가능!)를 매개변수에 담아줌
+        // 해당 매개변수를 이용해 다이얼로그가 종료될 때 동작할 함수 실행
         onDialogFinished(closePayload);
       })
       .catch((error) => {
         // 다이얼로그가 정상적으로 종료되지 않으면 에러 값을 건네줌
-        // 해당 에러 값을 이용해, 정상적으로 종료되지 않았을 때 동작할 함수 실행
+        // 해당 에러 값을 이용해 정상적으로 종료되지 않았을 때 동작할 함수 실행
         onDialogError(error);
       });
   };
 
+  // 다이얼로그가 정상적 흐름으로 종료되면 실행 될 함수
   var onDialogFinished = (payloadString) => {
-    var payload = JSON.parse(payloadString);
-    console.log(payload);
-    // 설정 값들을 쿠키에 저장하고
+    // 다이얼로그가 문자열로 준 데이터를 JSON 표기로 파싱
+    /*
+      payload = {
+        sheetName : 문자열,
+        columns : 배열
+      }
 
-    // 데이터를 가져온 뒤
-    getDataFrom(payload).then((sheetData) => {
+      위 payload 안에 있는 columns는 다음과 같은 구조를 가짐
+      !) 태블로 라이브러리에서 얻게 되는 columns과 다름
+      !) DataTables에 동적으로 컬럼을 생성하기 위해 만든 메타 데이터로 보면 됨
+      columns = [
+        {
+          fieldName : 문자열,
+          isImageURL : true/false,
+          altText : 문자열(디폴트 null)
+        }, 
+        {...}, 
+        ...
+      ]
+    */
+    var payload = JSON.parse(payloadString);
+
+    // ===================== 여기는 아직 미구현 =====================
+    // 설정 값들을 쿠키 혹은 tableau settings에 저장하고
+    // (참고) tableau settings는 워크북에 정보가 저장됨
+    // ===========================================================
+
+    // 다이얼로그에서 반환된 값을 바탕으로 태블로 라이브러리로부터
+    // 데이터를 가져와서 데이터 테이블 초기화(데이터 삽입)
+    getDataBy(payload).then((sheetData) => {
       // 테이블이 보이게 한 뒤 - 초기에 display: none 설정되어 있음
       $("#data-table").show();
+      // 데이터 테이블 설정할 때 바로 넣어주면 되는 형태의 columns를 얻음
       var columns = setColumns(payload.columns);
-      // 데이터테이블 생성
+      // 데이터 테이블 초기화
       initializeDataTable(columns, sheetData);
     });
   };
 
-  var getDataFrom = async (payload) => {
+  // 매개변수에 들어있는 sheetName을 기반으로
+  var getDataBy = async (payload) => {
     const worksheets = tableau.extensions.dashboardContent.dashboard.worksheets;
     var worksheet = worksheets.find(
       (sheet) => sheet.name === payload.sheetName
     );
 
-    return await worksheet
-      .getUnderlyingTablesAsync()
-      .then(async (logicalTable) => {
-        return await worksheet
-          .getUnderlyingTableDataAsync(logicalTable[0].id)
-          .then((dataTable) => {
-            var data = [];
-            dataTable.data.forEach((row) => {
-              var refinedRow = {};
-              row.forEach((data, idx) => {
-                refinedRow[payload.columns[idx].fieldName] =
-                  data.formattedValue;
-              });
-              data.push(refinedRow);
-            });
-            console.log(data);
-            return data;
-          });
+    return await worksheet.getSummaryDataAsync().then((summary) => {
+      var data = [];
+      summary.data.forEach((row) => {
+        var refinedRow = {};
+        row.forEach((data, idx) => {
+          refinedRow[payload.columns[idx].fieldName] = data.formattedValue;
+        });
+        data.push(refinedRow);
       });
+      return data;
+    });
   };
 
   // HTML Table 요소에 접근해 상단 컬럼명들 수정 및

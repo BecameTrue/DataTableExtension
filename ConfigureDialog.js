@@ -46,28 +46,15 @@
       (sheet) => sheet.name === selectedWorksheet
     );
 
-    return await worksheet
-      .getUnderlyingTablesAsync()
-      .then(async (logicalTable) => {
-        await worksheet
-          .getUnderlyingTableDataAsync(logicalTable[0].id)
-          .then((dataTable) => {
-            dataTable.columns.forEach((column) => {
-              columns.push({
-                fieldName: column.fieldName,
-                isImageURL: false,
-                altText: null,
-              });
-            });
-            // dataTable.data.forEach((row) => {
-            //   var refinedRow = {};
-            //   row.forEach((data, idx) => {
-            //     refinedRow[columns[idx].fieldName] = data.formattedValue;
-            //   });
-            //   sheetData.push(refinedRow);
-            // });
-          });
+    return await worksheet.getSummaryDataAsync().then((summary) => {
+      summary.columns.forEach((column) => {
+        columns.push({
+          fieldName: column.fieldName,
+          isImageURL: false,
+          altText: null,
+        });
       });
+    });
   };
 
   var showSettingDetailsArea = () => {
