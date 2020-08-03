@@ -4,7 +4,13 @@
     tableau.extensions.initializeAsync({ configure: configure }).then(
       // 초기화 완료되면 실행 될 함수
       function () {
-        // 버튼에 클릭 이벤트 달기
+        // ===================== 여기는 아직 미구현 =====================
+        // 이전에 구성을 했었다면 쿠키 혹은 tableau settings에 정보가 있으므로
+        // 구성 버튼을 보이게하지 않고 저장된 값 기반으로 실행해야함
+        // ===========================================================
+
+        // 버튼 표시 및 클릭 이벤트 달기
+        $("#configure-button").show();
         $("#configure-button").on("click", () => configure());
       },
       // 태블로 초기화 중 에러가 발생했을 때 로그
@@ -18,7 +24,7 @@
   var configure = () => {
     // 다이얼로그 HTML 파일 경로
     const dialogURL =
-      "http://localhost:8765/Samples/DataTableExtension/ConfigureDialog.html";
+      "https://chash.in/DataTableExtension/ConfigureDialog.html";
 
     /* 
       다이얼로그에게 전달해주고 싶은 값(문자열만 가능!)
@@ -86,38 +92,72 @@
       // 데이터 테이블 설정할 때 바로 넣어주면 되는 형태의 columns를 얻음
       var columns = setColumns(payload.columns);
       // 데이터 테이블 초기화
-      initializeDataTable(columns, sheetData);
+      renderDataTable(columns, sheetData);
     });
   };
 
   // 매개변수에 들어있는 sheetName을 기반으로
+  // 데이터 테이블 라이브러리에 맞는 형태로 데이터 가져옴
   var getDataBy = async (payload) => {
+    // 선택한 워크시트 찾기
     const worksheets = tableau.extensions.dashboardContent.dashboard.worksheets;
     var worksheet = worksheets.find(
       (sheet) => sheet.name === payload.sheetName
     );
 
+    // 선택한 워크시트에서 데이터를 가져오고 반환
     return await worksheet.getSummaryDataAsync().then((summary) => {
+      // 가져온 데이터들이 담길 배열
       var data = [];
+      // 각 데이터 행(배열 - row에 한 컬럼씩 담겨서 온다.) 별로
       summary.data.forEach((row) => {
-        var refinedRow = {};
-        row.forEach((data, idx) => {
-          refinedRow[payload.columns[idx].fieldName] = data.formattedValue;
+        // 데이터 테이블 라이브러리에 맞는 형태로 변환
+        var reformedRow = {};
+        /*
+          다음 과정을 통해 
+          {
+            컬럼명 : 데이터,
+            컬럼명 : 데이터,
+            ...
+          }
+          형태로 변환하게 됨
+        */
+        row.forEach((eachColumn, idx) => {
+          reformedRow[payload.columns[idx].fieldName] =
+            eachColumn.formattedValue;
         });
-        data.push(refinedRow);
+        // 변환 된 형태대로 데이터 배열에 저장
+        data.push(reformedRow);
       });
+      // 변환 된 형태의 데이터 반환
       return data;
     });
   };
 
   // HTML Table 요소에 접근해 상단 컬럼명들 수정 및
   // DataTables 초기화 용 컬럼 배열 반환
+  /*
+    [
+      { data: "컬럼명" },
+      { 
+        data: "컬럼명", 
+        render: function(data, type, row) {...}
+      },
+      ...
+    ] 
+    형태로 반환
+  */
   var setColumns = (columnsMetaData) => {
+    // 컬럼 배열
     var columns = [];
+    // columnsMetaData : fieldName, isImageURL, altText로 이루어진 배열
     columnsMetaData.forEach((meta) => {
       var col = {};
+      // 컬럼명을 담고
       col["data"] = meta.fieldName;
+      // 만약에 이미지 경로 컬럼이라면
       if (meta.isImageURL) {
+        // 이미지를 표시하도록 하고
         col["render"] = function (data, type, row) {
           if (type === "display") {
             return imageTag({
@@ -127,19 +167,22 @@
           } else return data;
         };
       }
+      // 이미지만 altText가 있게 코드는 짜놨지만, 일단 altText가 있으면 상단 컬럼명 변경
       if (!meta.altText || meta.altText === "") {
         $("#data-table-columns").append($("<th>" + meta.fieldName + "</th>"));
       } else {
         $("#data-table-columns").append($("<th>" + meta.altText + "</th>"));
       }
 
+      // 배열에 담음
       columns.push(col);
     });
 
     return columns;
   };
 
-  var initializeDataTable = (columns, dataToRender) => {
+  // 데이터 테이블 라이브러리 사용해서 테이블 생성
+  var renderDataTable = (columns, dataToRender) => {
     $("#data-table").DataTable({
       // 테이블이 알아서 재초기화 될 수 있도록 삭제 가능하게 설정
       // 이 설정이 없으면 같은 곳에 다시 테이블을 만들 수 없음
@@ -228,6 +271,7 @@
     return _start + _src + _class + _style;
   };
 
+  // 다이얼로그 에러 시 실행 될 함수
   var onDialogError = (error) => {
     if (error.errorCode === tableau.ErrorCodes.DialogClosedByUser) {
       console.log("사용자에 의한 다이얼로그 종료");

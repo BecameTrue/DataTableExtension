@@ -49,6 +49,7 @@
   </head>
 
   <body>
+    <!-- 워크시트 선택 공간 -->
     <div class="mb-4">
       <h4 class="font-weight-bold">워크시트 선택</h4>
       <p>표로 만들 워크시트를 선택 해주세요.</p>
@@ -57,12 +58,13 @@
 
     <hr class="mb-4" />
 
-    <div id="select-image-columns-area" class="mb-5" style="display: none;">
+    <!-- 이미지가 표시될 컬럼 선택 -->
+    <div id="select-image-column-area" class="mb-5" style="display: none;">
       <h5 class="font-weight-bold">이미지 컬럼</h5>
       <p>
         이미지 경로가 될 컬럼을 선택해주세요. (없으면 선택하지 않아도 됩니다.)
       </p>
-      <div id="select-image-columns" class="arrange-buttons"></div>
+      <div id="select-image-column" class="arrange-buttons"></div>
       <div class="form-group">
         <label for="alt-text">상단 컬럼명</label>
         <input
@@ -71,6 +73,7 @@
           id="alt-text"
           aria-describedby="alt-text-help"
         />
+        <!-- 이미지 컬럼의 상단 컬럼명 대체 텍스트 -->
         <small id="alt-text-help" class="form-text text-muted">
           표 상단에 표시될 컬럼명을 입력해주세요. (없으면 입력하지 않아도
           됩니다.)
@@ -78,6 +81,7 @@
       </div>
     </div>
 
+    <!-- 이미지 크기 지정 -->
     <div id="select-layout-area" class="mb-4" style="display: none;">
       <h5 class="font-weight-bold">레이아웃 설정</h5>
       <p>이미지 크기를 지정해주세요.</p>
@@ -95,6 +99,7 @@
       </div>
     </div>
 
+    <!-- 완료 버튼 -->
     <div class="container">
       <div class="row justify-content-end">
         <input
